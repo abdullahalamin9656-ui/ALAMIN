@@ -1,87 +1,85 @@
 
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Search, ShoppingBag, Menu, ArrowUpRight,
-  Smartphone, Laptop, Watch, Headphones,
-  Gamepad2, ArrowRight, Sparkles, X
+  ArrowUpRight, ShoppingBag, Menu, X,
+  Laptop, Smartphone, Watch, Headphones
 } from 'lucide-react';
 import HeroScene from './components/3d/HeroScene.jsx';
+import ProductDetails from './ProductDetails.jsx';
 
 const products = [
   {
     id: 1,
     name: 'MacBook Pro',
-    type: 'PRO LAPTOP',
-    price: '৳ 2,49,000',
-    icon: Laptop,
+    category: 'LAPTOP',
+    price: 249000,
     tag: 'BEST SELLER',
     image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900&q=85'
   },
   {
     id: 2,
     name: 'iPhone Pro',
-    type: 'SMARTPHONE',
-    price: '৳ 1,59,000',
-    icon: Smartphone,
+    category: 'SMARTPHONE',
+    price: 159000,
     tag: 'NEW ARRIVAL',
     image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900&q=85'
   },
   {
     id: 3,
     name: 'Ultra Watch',
-    type: 'SMART WATCH',
-    price: '৳ 45,000',
-    icon: Watch,
+    category: 'WEARABLE',
+    price: 45000,
     tag: 'POPULAR',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=85'
   },
   {
     id: 4,
     name: 'Studio Headphones',
-    type: 'PREMIUM AUDIO',
-    price: '৳ 28,000',
-    icon: Headphones,
-    tag: 'FEATURED',
+    category: 'AUDIO',
+    price: 28000,
+    tag: 'PREMIUM',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&q=85'
   }
 ];
 
 const categories = [
-  { name: 'Smartphones', icon: Smartphone, number: '01' },
-  { name: 'Laptops', icon: Laptop, number: '02' },
+  { name: 'Laptops', icon: Laptop, number: '01' },
+  { name: 'Smartphones', icon: Smartphone, number: '02' },
   { name: 'Smart Watches', icon: Watch, number: '03' },
-  { name: 'Gaming', icon: Gamepad2, number: '04' }
+  { name: 'Audio Devices', icon: Headphones, number: '04' }
 ];
 
-export default function App() {
+function HomePage() {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [cart, setCart] = useState([]);
 
-  return (
-    <main className="site">
+  const addToCart = (item) => {
+    setCart(current => [...current, item]);
+    alert(item.name + ' added to cart!');
+  };
 
+  return (
+    <div className="site">
       <div className="announcement">
-        <Sparkles size={13} />
-        <span>WELCOME TO THE FUTURE — DISCOVER ALAMIN</span>
-        <ArrowRight size={13} />
+        <span>✦</span> THE FUTURE OF TECHNOLOGY IS HERE
+        <span>✦</span>
       </div>
 
       <nav className="navbar">
-        <a className="logo" href="#">
-          ALA<span>MIN</span><i>.</i>
-        </a>
+        <a href="#home" className="logo">ALA<span>M</span><i>IN</i></a>
 
         <div className={`navlinks ${menuOpen ? 'nav-open' : ''}`}>
-          <a href="#" onClick={() => setMenuOpen(false)}>Home</a>
-          <a href="#products" onClick={() => setMenuOpen(false)}>Collection</a>
+          <a href="#home" onClick={() => setMenuOpen(false)}>Home</a>
           <a href="#categories" onClick={() => setMenuOpen(false)}>Categories</a>
+          <a href="#products" onClick={() => setMenuOpen(false)}>Products</a>
           <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
         </div>
 
         <div className="navactions">
-          <button aria-label="Search"><Search /></button>
-          <button aria-label="Shopping cart" className="cart-button">
+          <button className="cart-button" aria-label="Shopping cart">
             <ShoppingBag />
             <span>{cart.length}</span>
           </button>
@@ -91,102 +89,94 @@ export default function App() {
         </div>
       </nav>
 
-      <section className="hero">
+      <section className="hero" id="home">
         <div className="hero-glow"></div>
 
-        <div className="hero-content">
-          <motion.div
-            initial={{ opacity: 0, y: 45 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <div className="eyebrow">
-              <span className="live-dot"></span>
-              NEXT GENERATION TECHNOLOGY
-            </div>
-
-            <h1>
-              THE FUTURE<br />
-              IS <span>IN YOUR</span><br />
-              HANDS<span className="blue-dot">.</span>
-            </h1>
-
-            <p>
-              Explore extraordinary technology.
-              Discover innovation designed to move
-              your world forward.
-            </p>
-
-            <div className="hero-buttons">
-              <a href="#products" className="primary-btn">
-                EXPLORE COLLECTION <ArrowUpRight size={18} />
-              </a>
-              <a href="#about" className="secondary-btn">
-                DISCOVER ALAMIN
-              </a>
-            </div>
-
-            <div className="hero-stats">
-              <div><strong>01</strong><small>INNOVATION</small></div>
-              <div><strong>∞</strong><small>POSSIBILITIES</small></div>
-              <div><strong>100%</strong><small>FUTURE READY</small></div>
-            </div>
-          </motion.div>
-        </div>
-
         <motion.div
-          className="hero-visual"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.3 }}
+          className="hero-content"
+          initial={{ opacity: 0, y: 35 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
         >
-          <HeroScene />
-          <div className="visual-label">
-            <span>ALAMIN / 001</span>
-            <small>THE FUTURE COLLECTION</small>
+          <div className="eyebrow">
+            <span className="live-dot"></span>
+            NEXT GENERATION TECHNOLOGY
+          </div>
+
+          <h1>
+            ENTER THE<br />
+            <span>FUTURE</span><span className="blue-dot">.</span>
+          </h1>
+
+          <p>
+            Discover extraordinary technology.
+            Explore premium devices designed to
+            transform the way you experience life.
+          </p>
+
+          <div className="hero-buttons">
+            <a href="#products" className="primary-btn">
+              EXPLORE PRODUCTS <ArrowUpRight size={18} />
+            </a>
+            <a href="#categories" className="secondary-btn">
+              DISCOVER MORE ↗
+            </a>
+          </div>
+
+          <div className="hero-stats">
+            <div><strong>4+</strong><small>PRODUCT CATEGORIES</small></div>
+            <div><strong>3D</strong><small>FUTURE EXPERIENCE</small></div>
+            <div><strong>24/7</strong><small>ONLINE ACCESS</small></div>
           </div>
         </motion.div>
 
+        <div className="hero-visual">
+          <HeroScene />
+          <div className="visual-label">
+            <strong>ALAMIN / FUTURE DEVICE</strong>
+            <small>DESIGNED FOR TOMORROW</small>
+          </div>
+        </div>
+
         <div className="hero-bottom">
-          <span>SCROLL TO EXPLORE ↓</span>
-          <span>DESIGNED FOR TOMORROW</span>
+          <span>SCROLL TO EXPLORE</span>
+          <span>EST. 2026 — ALAMIN</span>
         </div>
       </section>
 
-      <section className="brand-strip">
-        <span>INNOVATION</span><i>✦</i>
-        <span>TECHNOLOGY</span><i>✦</i>
-        <span>EXPERIENCE</span><i>✦</i>
-        <span>ALAMIN</span>
-      </section>
+      <div className="brand-strip">
+        <span>APPLE</span>
+        <span>SAMSUNG</span>
+        <span><i>SONY</i></span>
+        <span>ASUS</span>
+        <span>JBL</span>
+      </div>
 
       <section className="categories" id="categories">
         <div className="section-heading">
           <div>
-            <span className="section-kicker">EXPLORE THE WORLD</span>
-            <h2>Find Your <span>Technology.</span></h2>
+            <span className="section-kicker">EXPLORE COLLECTIONS</span>
+            <h2>SHOP BY <span>CATEGORY</span></h2>
           </div>
-          <p>Everything you need.<br />All in one destination.</p>
+          <p>Discover technology that matches your lifestyle.</p>
         </div>
 
         <div className="category-grid">
-          {categories.map((item, index) => (
-            <motion.a
-              href="#products"
-              className="category-card"
-              key={item.name}
-              initial={{ opacity: 0, y: 35 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.12 }}
-              whileHover={{ y: -9 }}
-            >
-              <span className="category-number">{item.number}</span>
-              <item.icon size={42} strokeWidth={1.1} />
-              <h3>{item.name}</h3>
-              <ArrowUpRight size={19} className="category-arrow" />
-            </motion.a>
-          ))}
+          {categories.map((item) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                className="category-card"
+                key={item.number}
+                whileHover={{ y: -8 }}
+              >
+                <Icon size={42} />
+                <span className="category-number">{item.number}</span>
+                <h3>{item.name}</h3>
+                <ArrowUpRight className="category-arrow" />
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
@@ -194,46 +184,49 @@ export default function App() {
         <div className="section-heading">
           <div>
             <span className="section-kicker">HANDPICKED FOR YOU</span>
-            <h2>Featured <span>Collection.</span></h2>
+            <h2>FEATURED <span>PRODUCTS</span></h2>
           </div>
-          <a href="#products" className="view-all">
-            VIEW ALL <ArrowUpRight size={17} />
-          </a>
+          <span className="view-all">EXPLORE ALL <ArrowUpRight size={16} /></span>
         </div>
 
         <div className="product-grid">
-          {products.map((item, index) => (
+          {products.map((item) => (
             <motion.article
               className="product-card"
               key={item.id}
-              initial={{ opacity: 0, y: 45 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.13 }}
-              whileHover={{ y: -10 }}
+              whileHover={{ y: -7 }}
             >
-              <div className="product-image">
+              <div
+                className="product-image"
+                onClick={() => navigate(`/product/${item.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 <span className="product-tag">{item.tag}</span>
-
                 <img
                   className="product-photo"
                   src={item.image}
                   alt={item.name}
                   loading="lazy"
                 />
-
                 <button
                   className="quick-add"
-                  onClick={() => setCart(current => [...current, item])}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(item);
+                  }}
                 >
                   ADD TO CART <ArrowUpRight size={16} />
                 </button>
               </div>
 
-              <div className="product-info">
-                <small>{item.type}</small>
+              <div
+                className="product-info"
+                onClick={() => navigate(`/product/${item.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <small>{item.category}</small>
                 <h3>{item.name}</h3>
-                <strong>{item.price}</strong>
+                <strong>৳{item.price.toLocaleString('en-BD')}</strong>
               </div>
             </motion.article>
           ))}
@@ -242,29 +235,36 @@ export default function App() {
 
       <section className="experience" id="about">
         <div className="experience-glow"></div>
-        <span className="section-kicker">MORE THAN TECHNOLOGY</span>
-        <h2>Experience<br /><span>What’s Next.</span></h2>
+        <span className="section-kicker">WELCOME TO ALAMIN</span>
+        <h2>BEYOND THE<br /><span>ORDINARY.</span></h2>
         <p>
-          A new dimension of technology.
-          A new standard of experience.
-          Welcome to ALAMIN.
+          Technology is more than a device.
+          It is an experience. Discover your future with ALAMIN.
         </p>
         <a href="#products" className="primary-btn">
-          ENTER THE FUTURE <ArrowUpRight size={18} />
+          EXPLORE NOW <ArrowUpRight size={18} />
         </a>
       </section>
 
       <footer>
         <div className="footer-top">
-          <a className="logo" href="#">ALA<span>MIN</span><i>.</i></a>
-          <p>TECHNOLOGY BEYOND LIMITS.</p>
+          <a href="#home" className="logo">ALA<span>M</span><i>IN</i></a>
+          <p>THE FUTURE OF TECHNOLOGY</p>
         </div>
         <div className="footer-bottom">
           <small>© 2026 ALAMIN. ALL RIGHTS RESERVED.</small>
-          <small>BUILT FOR THE FUTURE.</small>
+          <small>DESIGNED FOR THE FUTURE.</small>
         </div>
       </footer>
+    </div>
+  );
+}
 
-    </main>
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
+    </Routes>
   );
 }
