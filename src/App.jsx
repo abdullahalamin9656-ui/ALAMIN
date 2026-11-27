@@ -1,13 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowUpRight, ShoppingBag, Menu, X,
   Laptop, Smartphone, Watch, Headphones
 } from 'lucide-react';
+
 import HeroScene from './components/3d/HeroScene.jsx';
 import ProductDetails from './ProductDetails.jsx';
+import Cart from './Cart.jsx';
 
 const products = [
   {
@@ -54,10 +56,39 @@ const categories = [
 function HomePage() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cart, setCart] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    const saved = JSON.parse(localStorage.getItem('alamin-cart') || '[]');
+    setCartCount(
+      saved.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0)
+    );
+  };
+
+  useEffect(() => {
+    updateCartCount();
+    window.addEventListener('storage', updateCartCount);
+    return () => window.removeEventListener('storage', updateCartCount);
+  }, []);
 
   const addToCart = (item) => {
-    setCart(current => [...current, item]);
+    const saved = JSON.parse(localStorage.getItem('alamin-cart') || '[]');
+    const existing = saved.find(p => p.id === item.id);
+
+    let updated;
+
+    if (existing) {
+      updated = saved.map(p =>
+        p.id === item.id
+          ? { ...p, quantity: (Number(p.quantity) || 1) + 1 }
+          : p
+      );
+    } else {
+      updated = [...saved, { ...item, quantity: 1 }];
+    }
+
+    localStorage.setItem('alamin-cart', JSON.stringify(updated));
+    updateCartCount();
     alert(item.name + ' added to cart!');
   };
 
@@ -79,11 +110,19 @@ function HomePage() {
         </div>
 
         <div className="navactions">
-          <button className="cart-button" aria-label="Shopping cart">
+          <button
+            className="cart-button"
+            aria-label="Shopping cart"
+            onClick={() => navigate('/cart')}
+          >
             <ShoppingBag />
-            <span>{cart.length}</span>
+            <span>{cartCount}</span>
           </button>
-          <button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
+
+          <button
+            className="mobile-menu"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
             {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -186,7 +225,9 @@ function HomePage() {
             <span className="section-kicker">HANDPICKED FOR YOU</span>
             <h2>FEATURED <span>PRODUCTS</span></h2>
           </div>
-          <span className="view-all">EXPLORE ALL <ArrowUpRight size={16} /></span>
+          <span className="view-all">
+            EXPLORE ALL <ArrowUpRight size={16} />
+          </span>
         </div>
 
         <div className="product-grid">
@@ -208,6 +249,7 @@ function HomePage() {
                   alt={item.name}
                   loading="lazy"
                 />
+
                 <button
                   className="quick-add"
                   onClick={(e) => {
@@ -265,6 +307,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/product/:id" element={<ProductDetails />} />
+      <Route path="/cart" element={<Cart />} />
     </Routes>
   );
 }
