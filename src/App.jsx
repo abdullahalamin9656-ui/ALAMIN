@@ -9,10 +9,42 @@ import {
 import HeroScene from './components/3d/HeroScene.jsx';
 
 const products = [
-  { id: 1, name: 'MacBook Pro', type: 'PRO LAPTOP', price: '৳ 2,49,000', icon: Laptop, tag: 'BEST SELLER' },
-  { id: 2, name: 'iPhone Pro', type: 'SMARTPHONE', price: '৳ 1,59,000', icon: Smartphone, tag: 'NEW ARRIVAL' },
-  { id: 3, name: 'Ultra Watch', type: 'SMART WATCH', price: '৳ 45,000', icon: Watch, tag: 'POPULAR' },
-  { id: 4, name: 'Studio Headphones', type: 'PREMIUM AUDIO', price: '৳ 28,000', icon: Headphones, tag: 'FEATURED' }
+  {
+    id: 1,
+    name: 'MacBook Pro',
+    type: 'PRO LAPTOP',
+    price: '৳ 2,49,000',
+    icon: Laptop,
+    tag: 'BEST SELLER',
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900&q=85'
+  },
+  {
+    id: 2,
+    name: 'iPhone Pro',
+    type: 'SMARTPHONE',
+    price: '৳ 1,59,000',
+    icon: Smartphone,
+    tag: 'NEW ARRIVAL',
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900&q=85'
+  },
+  {
+    id: 3,
+    name: 'Ultra Watch',
+    type: 'SMART WATCH',
+    price: '৳ 45,000',
+    icon: Watch,
+    tag: 'POPULAR',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=85'
+  },
+  {
+    id: 4,
+    name: 'Studio Headphones',
+    type: 'PREMIUM AUDIO',
+    price: '৳ 28,000',
+    icon: Headphones,
+    tag: 'FEATURED',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&q=85'
+  }
 ];
 
 const categories = [
@@ -41,7 +73,7 @@ export default function App() {
         </a>
 
         <div className={`navlinks ${menuOpen ? 'nav-open' : ''}`}>
-          <a href="#">Home</a>
+          <a href="#" onClick={() => setMenuOpen(false)}>Home</a>
           <a href="#products" onClick={() => setMenuOpen(false)}>Collection</a>
           <a href="#categories" onClick={() => setMenuOpen(false)}>Categories</a>
           <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
@@ -122,12 +154,9 @@ export default function App() {
       </section>
 
       <section className="brand-strip">
-        <span>INNOVATION</span>
-        <i>✦</i>
-        <span>TECHNOLOGY</span>
-        <i>✦</i>
-        <span>EXPERIENCE</span>
-        <i>✦</i>
+        <span>INNOVATION</span><i>✦</i>
+        <span>TECHNOLOGY</span><i>✦</i>
+        <span>EXPERIENCE</span><i>✦</i>
         <span>ALAMIN</span>
       </section>
 
@@ -185,16 +214,22 @@ export default function App() {
             >
               <div className="product-image">
                 <span className="product-tag">{item.tag}</span>
-                <div className="product-art">
-                  <item.icon size={100} strokeWidth={0.8} />
-                </div>
+
+                <img
+                  className="product-photo"
+                  src={item.image}
+                  alt={item.name}
+                  loading="lazy"
+                />
+
                 <button
                   className="quick-add"
-                  onClick={() => setCart([...cart, item])}
+                  onClick={() => setCart(current => [...current, item])}
                 >
                   ADD TO CART <ArrowUpRight size={16} />
                 </button>
               </div>
+
               <div className="product-info">
                 <small>{item.type}</small>
                 <h3>{item.name}</h3>
