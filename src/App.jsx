@@ -2,121 +2,148 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+
 import {
-  ArrowUpRight, ShoppingBag, Menu, X,
-  Laptop, Smartphone, Watch, Headphones
+  ArrowUpRight,
+  ShoppingBag,
+  Menu,
+  X,
+  Laptop,
+  Smartphone,
+  Watch,
+  Headphones
 } from 'lucide-react';
 
 import HeroScene from './components/3d/HeroScene.jsx';
 import ProductDetails from './ProductDetails.jsx';
 import Cart from './Cart.jsx';
 import Checkout from './Checkout.jsx';
+import OrderSuccess from './OrderSuccess.jsx';
 
+// PRODUCT DATA
 const products = [
   {
     id: 1,
     name: 'MacBook Pro',
     category: 'LAPTOP',
     price: 249000,
-    tag: 'BEST SELLER',
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900&q=85'
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900'
   },
   {
     id: 2,
     name: 'iPhone Pro',
     category: 'SMARTPHONE',
     price: 159000,
-    tag: 'NEW ARRIVAL',
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900&q=85'
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900'
   },
   {
     id: 3,
     name: 'Ultra Watch',
     category: 'WEARABLE',
     price: 45000,
-    tag: 'POPULAR',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=85'
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900'
   },
   {
     id: 4,
     name: 'Studio Headphones',
     category: 'AUDIO',
     price: 28000,
-    tag: 'PREMIUM',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&q=85'
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900'
   }
 ];
 
 const categories = [
-  { name: 'Laptops', icon: Laptop, number: '01' },
-  { name: 'Smartphones', icon: Smartphone, number: '02' },
-  { name: 'Smart Watches', icon: Watch, number: '03' },
-  { name: 'Audio Devices', icon: Headphones, number: '04' }
+  { name: 'Laptops', icon: Laptop },
+  { name: 'Smartphones', icon: Smartphone },
+  { name: 'Watches', icon: Watch },
+  { name: 'Audio', icon: Headphones }
 ];
 
 function HomePage() {
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
 
-  const updateCartCount = () => {
-    const saved = JSON.parse(localStorage.getItem('alamin-cart') || '[]');
-    setCartCount(
-      saved.reduce(
-        (sum, item) => sum + (Number(item.quantity) || 1),
-        0
-      )
-    );
-  };
+  const [cartCount, setCartCount] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    const updateCartCount = () => {
+      const cart = JSON.parse(
+        localStorage.getItem('alamin-cart') || '[]'
+      );
+
+      const count = cart.reduce(
+        (sum, item) => sum + Number(item.quantity || 1),
+        0
+      );
+
+      setCartCount(count);
+    };
+
     updateCartCount();
+
     window.addEventListener('storage', updateCartCount);
-    return () => window.removeEventListener('storage', updateCartCount);
+
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+    };
   }, []);
 
-  const addToCart = (item) => {
-    const saved = JSON.parse(localStorage.getItem('alamin-cart') || '[]');
-    const existing = saved.find(p => p.id === item.id);
+  const addToCart = (product) => {
+    const cart = JSON.parse(
+      localStorage.getItem('alamin-cart') || '[]'
+    );
 
-    const updated = existing
-      ? saved.map(p =>
-          p.id === item.id
-            ? { ...p, quantity: (Number(p.quantity) || 1) + 1 }
-            : p
-        )
-      : [...saved, { ...item, quantity: 1 }];
+    const existing = cart.find(
+      item => String(item.id) === String(product.id)
+    );
 
-    localStorage.setItem('alamin-cart', JSON.stringify(updated));
-    updateCartCount();
-    alert(item.name + ' added to cart!');
+    if (existing) {
+      existing.quantity = Number(existing.quantity || 1) + 1;
+    } else {
+      cart.push({
+        ...product,
+        quantity: 1
+      });
+    }
+
+    localStorage.setItem('alamin-cart', JSON.stringify(cart));
+
+    const count = cart.reduce(
+      (sum, item) => sum + Number(item.quantity || 1),
+      0
+    );
+
+    setCartCount(count);
   };
 
   return (
     <div className="site">
-      <div className="announcement">
-        <span>✦</span> THE FUTURE OF TECHNOLOGY IS HERE
-        <span>✦</span>
-      </div>
 
+      {/* NAVBAR */}
       <nav className="navbar">
-        <a href="#home" className="logo">ALA<span>M</span><i>IN</i></a>
-
-        <div className={`navlinks ${menuOpen ? 'nav-open' : ''}`}>
-          <a href="#home" onClick={() => setMenuOpen(false)}>Home</a>
-          <a href="#categories" onClick={() => setMenuOpen(false)}>Categories</a>
-          <a href="#products" onClick={() => setMenuOpen(false)}>Products</a>
-          <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
+        <div
+          className="logo"
+          onClick={() => navigate('/')}
+          style={{ cursor: 'pointer' }}
+        >
+          ALAMIN<span>.</span>
         </div>
 
-        <div className="navactions">
+        <div className="nav-links">
+          <a href="#home">Home</a>
+          <a href="#categories">Categories</a>
+          <a href="#products">Products</a>
+          <a href="#experience">Experience</a>
+        </div>
+
+        <div className="nav-actions">
           <button
             className="cart-button"
-            aria-label="Shopping cart"
             onClick={() => navigate('/cart')}
           >
-            <ShoppingBag />
-            <span>{cartCount}</span>
+            <ShoppingBag size={19} />
+            <span>Cart</span>
+            <span className="cart-count">{cartCount}</span>
           </button>
 
           <button
@@ -128,177 +155,225 @@ function HomePage() {
         </div>
       </nav>
 
+      {menuOpen && (
+        <div className="mobile-nav">
+          <a href="#home" onClick={() => setMenuOpen(false)}>Home</a>
+          <a href="#categories" onClick={() => setMenuOpen(false)}>Categories</a>
+          <a href="#products" onClick={() => setMenuOpen(false)}>Products</a>
+          <a href="#experience" onClick={() => setMenuOpen(false)}>Experience</a>
+        </div>
+      )}
+
+      {/* HERO */}
       <section className="hero" id="home">
-        <div className="hero-glow"></div>
+        <div className="hero-content">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="hero-tag">
+              <span className="pulse-dot"></span>
+              THE FUTURE IS HERE
+            </div>
 
-        <motion.div
-          className="hero-content"
-          initial={{ opacity: 0, y: 35 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="eyebrow">
-            <span className="live-dot"></span>
-            NEXT GENERATION TECHNOLOGY
-          </div>
+            <h1>
+              Technology
+              <br />
+              <span>Beyond Limits.</span>
+            </h1>
 
-          <h1>
-            ENTER THE<br />
-            <span>FUTURE</span><span className="blue-dot">.</span>
-          </h1>
+            <p>
+              Discover premium technology, futuristic devices
+              and powerful innovations designed for your future.
+            </p>
 
-          <p>
-            Discover extraordinary technology.
-            Explore premium devices designed to
-            transform the way you experience life.
-          </p>
+            <div className="hero-buttons">
+              <button
+                className="primary-btn"
+                onClick={() =>
+                  document.getElementById('products')?.scrollIntoView({
+                    behavior: 'smooth'
+                  })
+                }
+              >
+                EXPLORE PRODUCTS
+                <ArrowUpRight size={18} />
+              </button>
 
-          <div className="hero-buttons">
-            <a href="#products" className="primary-btn">
-              EXPLORE PRODUCTS <ArrowUpRight size={18} />
-            </a>
-            <a href="#categories" className="secondary-btn">
-              DISCOVER MORE ↗
-            </a>
-          </div>
+              <button
+                className="secondary-btn"
+                onClick={() => navigate('/cart')}
+              >
+                <ShoppingBag size={18} />
+                MY CART
+              </button>
+            </div>
 
-          <div className="hero-stats">
-            <div><strong>4+</strong><small>PRODUCT CATEGORIES</small></div>
-            <div><strong>3D</strong><small>FUTURE EXPERIENCE</small></div>
-            <div><strong>24/7</strong><small>ONLINE ACCESS</small></div>
-          </div>
-        </motion.div>
+            <div className="hero-stats">
+              <div>
+                <strong>100%</strong>
+                <span>QUALITY FOCUS</span>
+              </div>
+              <div>
+                <strong>24/7</strong>
+                <span>ONLINE ACCESS</span>
+              </div>
+              <div>
+                <strong>NEW</strong>
+                <span>TECH COLLECTION</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
 
         <div className="hero-visual">
           <HeroScene />
-          <div className="visual-label">
-            <strong>ALAMIN / FUTURE DEVICE</strong>
-            <small>DESIGNED FOR TOMORROW</small>
-          </div>
-        </div>
-
-        <div className="hero-bottom">
-          <span>SCROLL TO EXPLORE</span>
-          <span>EST. 2026 — ALAMIN</span>
         </div>
       </section>
 
-      <div className="brand-strip">
-        <span>APPLE</span>
-        <span>SAMSUNG</span>
-        <span><i>SONY</i></span>
-        <span>ASUS</span>
-        <span>JBL</span>
-      </div>
+      {/* BRAND STRIP */}
+      <section className="brand-strip">
+        <span>PREMIUM TECHNOLOGY</span>
+        <span>FUTURE INNOVATION</span>
+        <span>SMART LIFESTYLE</span>
+        <span>ALAMIN COLLECTION</span>
+      </section>
 
-      <section className="categories" id="categories">
+      {/* CATEGORIES */}
+      <section className="categories-section" id="categories">
         <div className="section-heading">
-          <div>
-            <span className="section-kicker">EXPLORE COLLECTIONS</span>
-            <h2>SHOP BY <span>CATEGORY</span></h2>
-          </div>
-          <p>Discover technology that matches your lifestyle.</p>
+          <span className="eyebrow">EXPLORE COLLECTIONS</span>
+          <h2>Shop By Category</h2>
+          <p>Find the technology that matches your lifestyle.</p>
         </div>
 
         <div className="category-grid">
-          {categories.map((item) => {
-            const Icon = item.icon;
+          {categories.map((category, index) => {
+            const Icon = category.icon;
+
             return (
               <motion.div
                 className="category-card"
-                key={item.number}
-                whileHover={{ y: -8 }}
+                key={category.name}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() =>
+                  document.getElementById('products')?.scrollIntoView({
+                    behavior: 'smooth'
+                  })
+                }
               >
-                <Icon size={42} />
-                <span className="category-number">{item.number}</span>
-                <h3>{item.name}</h3>
-                <ArrowUpRight className="category-arrow" />
+                <Icon size={34} />
+                <h3>{category.name}</h3>
+                <ArrowUpRight size={18} />
               </motion.div>
             );
           })}
         </div>
       </section>
 
-      <section className="products" id="products">
+      {/* PRODUCTS */}
+      <section className="products-section" id="products">
         <div className="section-heading">
-          <div>
-            <span className="section-kicker">HANDPICKED FOR YOU</span>
-            <h2>FEATURED <span>PRODUCTS</span></h2>
-          </div>
-          <span className="view-all">
-            EXPLORE ALL <ArrowUpRight size={16} />
-          </span>
+          <span className="eyebrow">OUR PREMIUM SELECTION</span>
+          <h2>Featured Products</h2>
+          <p>Discover our latest technology collection.</p>
         </div>
 
         <div className="product-grid">
-          {products.map((item) => (
-            <motion.article
+          {products.map((product, index) => (
+            <motion.div
               className="product-card"
-              key={item.id}
-              whileHover={{ y: -7 }}
+              key={product.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.12 }}
             >
               <div
                 className="product-image"
-                onClick={() => navigate(`/product/${item.id}`)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/product/${product.id}`)}
               >
-                <span className="product-tag">{item.tag}</span>
-
                 <img
                   className="product-photo"
-                  src={item.image}
-                  alt={item.name}
-                  loading="lazy"
+                  src={product.image}
+                  alt={product.name}
                 />
+                <span className="product-category">
+                  {product.category}
+                </span>
+              </div>
+
+              <div className="product-info">
+                <h3>{product.name}</h3>
+
+                <div className="product-bottom">
+                  <strong>
+                    ৳{product.price.toLocaleString('en-IN')}
+                  </strong>
+
+                  <button
+                    className="add-cart-btn"
+                    onClick={() => addToCart(product)}
+                  >
+                    <ShoppingBag size={17} />
+                    Add
+                  </button>
+                </div>
 
                 <button
-                  className="quick-add"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToCart(item);
-                  }}
+                  className="view-product-btn"
+                  onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  ADD TO CART <ArrowUpRight size={16} />
+                  VIEW DETAILS
+                  <ArrowUpRight size={15} />
                 </button>
               </div>
-
-              <div
-                className="product-info"
-                onClick={() => navigate(`/product/${item.id}`)}
-                style={{ cursor: 'pointer' }}
-              >
-                <small>{item.category}</small>
-                <h3>{item.name}</h3>
-                <strong>৳{item.price.toLocaleString('en-BD')}</strong>
-              </div>
-            </motion.article>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      <section className="experience" id="about">
-        <div className="experience-glow"></div>
-        <span className="section-kicker">WELCOME TO ALAMIN</span>
-        <h2>BEYOND THE<br /><span>ORDINARY.</span></h2>
-        <p>
-          Technology is more than a device.
-          It is an experience. Discover your future with ALAMIN.
-        </p>
-        <a href="#products" className="primary-btn">
-          EXPLORE NOW <ArrowUpRight size={18} />
-        </a>
+      {/* EXPERIENCE */}
+      <section className="experience-section" id="experience">
+        <div className="experience-content">
+          <span className="eyebrow">THE ALAMIN EXPERIENCE</span>
+          <h2>
+            Upgrade Your
+            <br />
+            <span>Digital Lifestyle.</span>
+          </h2>
+          <p>
+            Explore modern technology with a premium shopping
+            experience built for the next generation.
+          </p>
+
+          <button
+            className="primary-btn"
+            onClick={() =>
+              document.getElementById('products')?.scrollIntoView({
+                behavior: 'smooth'
+              })
+            }
+          >
+            DISCOVER NOW
+            <ArrowUpRight size={18} />
+          </button>
+        </div>
       </section>
 
-      <footer>
-        <div className="footer-top">
-          <a href="#home" className="logo">ALA<span>M</span><i>IN</i></a>
-          <p>THE FUTURE OF TECHNOLOGY</p>
-        </div>
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="footer-logo">ALAMIN<span>.</span></div>
+        <p>THE FUTURE OF TECHNOLOGY</p>
         <div className="footer-bottom">
-          <small>© 2026 ALAMIN. ALL RIGHTS RESERVED.</small>
-          <small>DESIGNED FOR THE FUTURE.</small>
+          © {new Date().getFullYear()} ALAMIN. All rights reserved.
         </div>
       </footer>
+
     </div>
   );
 }
@@ -310,6 +385,7 @@ export default function App() {
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
+      <Route path="/success" element={<OrderSuccess />} />
     </Routes>
   );
 }
