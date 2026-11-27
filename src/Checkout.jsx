@@ -5,10 +5,8 @@ import {
   ArrowLeft,
   ShoppingBag,
   User,
-  Phone,
-  MapPin,
-  Truck,
-  MessageCircle
+  MessageCircle,
+  Truck
 } from 'lucide-react';
 
 export default function Checkout() {
@@ -36,13 +34,12 @@ export default function Checkout() {
     0
   );
 
-  const deliveryCharge = 0;
-  const total = subtotal + deliveryCharge;
+  const total = subtotal;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((previous) => ({
-      ...previous,
+    setForm(prev => ({
+      ...prev,
       [name]: value
     }));
   };
@@ -56,38 +53,40 @@ export default function Checkout() {
       return;
     }
 
-    const orderItems = cart.map((item, index) => {
-      const name = item.name || item.title || 'Product';
+    const order = {
+      customer: form,
+      items: cart,
+      total,
+      createdAt: new Date().toISOString()
+    };
 
-      return (
-        `${index + 1}. ${name}\n` +
-        `Quantity: ${item.quantity || 1}\n` +
-        `Price: ৳${Number(item.price || 0).toLocaleString('en-IN')}\n`
-      );
-    }).join('\n');
+    localStorage.setItem(
+      'alamin-pending-order',
+      JSON.stringify(order)
+    );
+
+    const orderItems = cart.map((item, index) => (
+      `${index + 1}. ${item.name || item.title || 'Product'}\n` +
+      `Quantity: ${item.quantity || 1}\n` +
+      `Price: ৳${Number(item.price || 0).toLocaleString('en-IN')}`
+    )).join('\n\n');
 
     const message = `
 🛒 ALAMIN - NEW ORDER
 
-👤 CUSTOMER INFORMATION
-
+CUSTOMER INFORMATION
 Name: ${form.name}
 Phone: ${form.phone}
 District: ${form.district}
 Area: ${form.area}
-Full Address: ${form.address}
+Address: ${form.address}
 
-📦 ORDER DETAILS
-
+ORDER DETAILS
 ${orderItems}
 
-💰 Subtotal: ৳${subtotal.toLocaleString('en-IN')}
-🚚 Delivery: To be confirmed
-💵 Total: ৳${total.toLocaleString('en-IN')}
+TOTAL: ৳${total.toLocaleString('en-IN')}
 
 Please confirm my order.
-
-Thank you for shopping with ALAMIN.
 `;
 
     const whatsappURL =
@@ -120,22 +119,16 @@ Thank you for shopping with ALAMIN.
       border: '1px solid #243c5b',
       color: '#fff',
       padding: '10px',
-      borderRadius: '12px',
-      cursor: 'pointer'
+      borderRadius: '12px'
     },
     title: {
       fontSize: '26px',
       fontWeight: '800',
       margin: 0
     },
-    subtitle: {
-      color: '#8fa6c3',
-      marginTop: '6px',
-      fontSize: '13px'
-    },
     grid: {
       display: 'grid',
-      gridTemplateColumns: 'minmax(0, 1.5fr) minmax(280px, 0.9fr)',
+      gridTemplateColumns: 'minmax(0, 1.5fr) minmax(280px, .9fr)',
       gap: '22px',
       alignItems: 'start'
     },
@@ -148,7 +141,6 @@ Thank you for shopping with ALAMIN.
     },
     heading: {
       fontSize: '18px',
-      fontWeight: '750',
       margin: '0 0 22px',
       display: 'flex',
       alignItems: 'center',
@@ -168,7 +160,6 @@ Thank you for shopping with ALAMIN.
       borderRadius: '10px',
       padding: '14px',
       color: '#fff',
-      outline: 'none',
       fontSize: '14px',
       marginBottom: '17px'
     },
@@ -180,45 +171,28 @@ Thank you for shopping with ALAMIN.
       borderRadius: '10px',
       padding: '14px',
       color: '#fff',
-      outline: 'none',
-      fontSize: '14px',
       minHeight: '100px',
-      resize: 'vertical'
+      fontSize: '14px'
     },
-    item: {
+    row: {
       display: 'flex',
       justifyContent: 'space-between',
       gap: '12px',
       padding: '14px 0',
-      borderBottom: '1px solid #20324b'
-    },
-    itemName: {
-      fontSize: '14px',
-      fontWeight: '650'
-    },
-    muted: {
-      color: '#8fa6c3',
-      fontSize: '12px',
-      marginTop: '6px'
-    },
-    totalRow: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      marginTop: '16px',
-      color: '#b8c8dc',
+      borderBottom: '1px solid #20324b',
       fontSize: '14px'
     },
-    grandTotal: {
+    total: {
       display: 'flex',
       justifyContent: 'space-between',
-      marginTop: '20px',
-      paddingTop: '18px',
-      borderTop: '1px solid #29415f',
+      color: '#00d9ff',
       fontSize: '20px',
       fontWeight: '800',
-      color: '#00d9ff'
+      marginTop: '20px',
+      paddingTop: '18px',
+      borderTop: '1px solid #29415f'
     },
-    submit: {
+    button: {
       width: '100%',
       border: 'none',
       borderRadius: '12px',
@@ -239,29 +213,18 @@ Thank you for shopping with ALAMIN.
       fontSize: '12px',
       lineHeight: '1.7',
       marginTop: '15px'
-    },
-    empty: {
-      textAlign: 'center',
-      padding: '60px 20px',
-      color: '#9bb0ca'
     }
   };
 
   if (cart.length === 0) {
     return (
       <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.empty}>
-            <ShoppingBag size={48} />
-            <h2>Your Cart Is Empty</h2>
-            <p>Add products before checkout.</p>
-            <button
-              style={styles.submit}
-              onClick={() => navigate('/')}
-            >
-              CONTINUE SHOPPING
-            </button>
-          </div>
+        <div style={{ ...styles.container, textAlign: 'center', paddingTop: '80px' }}>
+          <ShoppingBag size={45} />
+          <h2>Your Cart Is Empty</h2>
+          <button style={styles.button} onClick={() => navigate('/')}>
+            CONTINUE SHOPPING
+          </button>
         </div>
       </div>
     );
@@ -281,7 +244,7 @@ Thank you for shopping with ALAMIN.
 
           <div>
             <h1 style={styles.title}>CHECKOUT</h1>
-            <p style={styles.subtitle}>
+            <p style={{ color: '#8fa6c3', fontSize: '13px' }}>
               Complete your order at ALAMIN
             </p>
           </div>
@@ -290,97 +253,79 @@ Thank you for shopping with ALAMIN.
         <form onSubmit={handleSubmit}>
           <div style={styles.grid}>
 
-            <div>
-              <div style={styles.card}>
-                <h2 style={styles.heading}>
-                  <User color="#00d9ff" size={20} />
-                  Delivery Information
-                </h2>
+            <div style={styles.card}>
+              <h2 style={styles.heading}>
+                <User color="#00d9ff" />
+                Delivery Information
+              </h2>
 
-                <label style={styles.label}>
-                  Full Name *
-                </label>
-                <input
-                  style={styles.input}
-                  type="text"
-                  name="name"
-                  placeholder="Enter your full name"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                />
+              <label style={styles.label}>Full Name *</label>
+              <input
+                style={styles.input}
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Your full name"
+                required
+              />
 
-                <label style={styles.label}>
-                  Phone Number *
-                </label>
-                <input
-                  style={styles.input}
-                  type="tel"
-                  name="phone"
-                  placeholder="01XXXXXXXXX"
-                  pattern="01[0-9]{9}"
-                  value={form.phone}
-                  onChange={handleChange}
-                  required
-                />
+              <label style={styles.label}>Phone Number *</label>
+              <input
+                style={styles.input}
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="01XXXXXXXXX"
+                pattern="01[0-9]{9}"
+                required
+              />
 
-                <label style={styles.label}>
-                  District *
-                </label>
-                <input
-                  style={styles.input}
-                  type="text"
-                  name="district"
-                  placeholder="Your district"
-                  value={form.district}
-                  onChange={handleChange}
-                  required
-                />
+              <label style={styles.label}>District *</label>
+              <input
+                style={styles.input}
+                name="district"
+                value={form.district}
+                onChange={handleChange}
+                placeholder="Your district"
+                required
+              />
 
-                <label style={styles.label}>
-                  Area / Upazila *
-                </label>
-                <input
-                  style={styles.input}
-                  type="text"
-                  name="area"
-                  placeholder="Your area or upazila"
-                  value={form.area}
-                  onChange={handleChange}
-                  required
-                />
+              <label style={styles.label}>Area / Upazila *</label>
+              <input
+                style={styles.input}
+                name="area"
+                value={form.area}
+                onChange={handleChange}
+                placeholder="Your area"
+                required
+              />
 
-                <label style={styles.label}>
-                  Full Delivery Address *
-                </label>
-                <textarea
-                  style={styles.textarea}
-                  name="address"
-                  placeholder="House, road, village and other details"
-                  value={form.address}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+              <label style={styles.label}>Full Address *</label>
+              <textarea
+                style={styles.textarea}
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="House, road, village and other details"
+                required
+              />
             </div>
 
             <div>
               <div style={styles.card}>
                 <h2 style={styles.heading}>
-                  <ShoppingBag color="#00d9ff" size={20} />
+                  <ShoppingBag color="#00d9ff" />
                   Your Order
                 </h2>
 
                 {cart.map((item, index) => (
-                  <div
-                    key={item.id || index}
-                    style={styles.item}
-                  >
+                  <div key={item.id || index} style={styles.row}>
                     <div>
-                      <div style={styles.itemName}>
+                      <strong>
                         {item.name || item.title || 'Product'}
-                      </div>
-                      <div style={styles.muted}>
+                      </strong>
+                      <div style={styles.note}>
                         Quantity: {item.quantity || 1}
                       </div>
                     </div>
@@ -394,49 +339,41 @@ Thank you for shopping with ALAMIN.
                   </div>
                 ))}
 
-                <div style={styles.totalRow}>
+                <div style={styles.row}>
                   <span>Subtotal</span>
-                  <strong>
-                    ৳{subtotal.toLocaleString('en-IN')}
-                  </strong>
+                  <strong>৳{subtotal.toLocaleString('en-IN')}</strong>
                 </div>
 
-                <div style={styles.totalRow}>
-                  <span>Delivery Charge</span>
+                <div style={styles.row}>
+                  <span>Delivery</span>
                   <strong>To be confirmed</strong>
                 </div>
 
-                <div style={styles.grandTotal}>
+                <div style={styles.total}>
                   <span>Total</span>
-                  <span>
-                    ৳{total.toLocaleString('en-IN')}
-                  </span>
+                  <span>৳{total.toLocaleString('en-IN')}</span>
                 </div>
 
-                <button
-                  type="submit"
-                  style={styles.submit}
-                >
+                <button type="submit" style={styles.button}>
                   <MessageCircle size={19} />
                   ORDER VIA WHATSAPP
                 </button>
 
                 <p style={styles.note}>
-                  By placing your order, WhatsApp will open with
-                  your order details. Review the message and press
-                  Send to submit your order. Delivery charges will
-                  be confirmed separately.
+                  WhatsApp will open with your order details.
+                  Press Send in WhatsApp to submit your order.
+                  After returning, you can view the order success page.
                 </p>
               </div>
 
               <div style={styles.card}>
                 <h3 style={styles.heading}>
-                  <Truck color="#00d9ff" size={20} />
+                  <Truck color="#00d9ff" />
                   Delivery Support
                 </h3>
                 <p style={styles.note}>
-                  Our team will contact you to confirm your order
-                  and delivery details.
+                  Our team will contact you to confirm your
+                  order and delivery information.
                 </p>
               </div>
             </div>
