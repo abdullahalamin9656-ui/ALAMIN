@@ -10,6 +10,7 @@ import {
 import HeroScene from './components/3d/HeroScene.jsx';
 import ProductDetails from './ProductDetails.jsx';
 import Cart from './Cart.jsx';
+import Checkout from './Checkout.jsx';
 
 const products = [
   {
@@ -61,7 +62,10 @@ function HomePage() {
   const updateCartCount = () => {
     const saved = JSON.parse(localStorage.getItem('alamin-cart') || '[]');
     setCartCount(
-      saved.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0)
+      saved.reduce(
+        (sum, item) => sum + (Number(item.quantity) || 1),
+        0
+      )
     );
   };
 
@@ -75,17 +79,13 @@ function HomePage() {
     const saved = JSON.parse(localStorage.getItem('alamin-cart') || '[]');
     const existing = saved.find(p => p.id === item.id);
 
-    let updated;
-
-    if (existing) {
-      updated = saved.map(p =>
-        p.id === item.id
-          ? { ...p, quantity: (Number(p.quantity) || 1) + 1 }
-          : p
-      );
-    } else {
-      updated = [...saved, { ...item, quantity: 1 }];
-    }
+    const updated = existing
+      ? saved.map(p =>
+          p.id === item.id
+            ? { ...p, quantity: (Number(p.quantity) || 1) + 1 }
+            : p
+        )
+      : [...saved, { ...item, quantity: 1 }];
 
     localStorage.setItem('alamin-cart', JSON.stringify(updated));
     updateCartCount();
@@ -243,6 +243,7 @@ function HomePage() {
                 style={{ cursor: 'pointer' }}
               >
                 <span className="product-tag">{item.tag}</span>
+
                 <img
                   className="product-photo"
                   src={item.image}
@@ -308,6 +309,7 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
     </Routes>
   );
 }
