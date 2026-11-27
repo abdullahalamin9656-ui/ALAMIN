@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import {
   Search, ShoppingBag, Menu, ArrowRight,
   Smartphone, Laptop, Watch, Headphones,
-  Gamepad2, Sparkles
+  Sparkles
 } from 'lucide-react';
+
+import HeroScene from './components/3d/HeroScene.jsx';
 
 const products = [
   { name: 'MacBook Pro', type: 'Premium Laptop', price: '$1,999', icon: Laptop },
@@ -17,14 +19,19 @@ const products = [
 export default function App() {
   return (
     <main className="site">
+
       <nav className="navbar">
-        <a className="logo" href="#">ALA<span>MIN</span><i>.</i></a>
+        <a className="logo" href="#">
+          ALA<span>MIN</span><i>.</i>
+        </a>
+
         <div className="navlinks">
           <a href="#">Home</a>
           <a href="#products">Products</a>
           <a href="#categories">Categories</a>
           <a href="#about">About</a>
         </div>
+
         <div className="navactions">
           <Search />
           <ShoppingBag />
@@ -34,6 +41,7 @@ export default function App() {
 
       <section className="hero">
         <div className="hero-glow"></div>
+
         <div className="hero-content">
           <motion.div
             initial={{ opacity: 0, y: 25 }}
@@ -43,13 +51,18 @@ export default function App() {
             <div className="eyebrow">
               <Sparkles size={15} /> THE FUTURE IS HERE
             </div>
-            <h1>TECHNOLOGY<br />
-              <span>BEYOND</span><br />LIMITS.
+
+            <h1>
+              TECHNOLOGY<br />
+              <span>BEYOND</span><br />
+              LIMITS.
             </h1>
+
             <p>
               Discover the next generation of technology.
               Experience innovation without boundaries.
             </p>
+
             <a href="#products" className="primary-btn">
               EXPLORE COLLECTION <ArrowRight size={18} />
             </a>
@@ -57,15 +70,9 @@ export default function App() {
         </div>
 
         <div className="hero-visual">
-          <div className="orbit orbit-one"></div>
-          <div className="orbit orbit-two"></div>
-          <div className="product-orb">
-            <Laptop size={130} strokeWidth={0.7} />
-          </div>
-          <div className="floating-tag tag-one">NEXT GEN</div>
-          <div className="floating-tag tag-two">INNOVATION</div>
-          <div className="visual-caption">01 / FUTURE COLLECTION</div>
+          <HeroScene />
         </div>
+
         <div className="hero-bottom">
           <span>SCROLL TO EXPLORE ↓</span>
           <span>PREMIUM TECHNOLOGY STORE</span>
@@ -77,6 +84,7 @@ export default function App() {
           <span>DISCOVER</span>
           <h2>Explore Categories</h2>
         </div>
+
         <div className="category-grid">
           {products.map((item) => (
             <div className="category-card" key={item.name}>
@@ -93,6 +101,7 @@ export default function App() {
           <span>CURATED FOR YOU</span>
           <h2>Featured Products</h2>
         </div>
+
         <div className="product-grid">
           {products.map((item, index) => (
             <motion.article
@@ -107,6 +116,7 @@ export default function App() {
                 <item.icon size={85} strokeWidth={0.8} />
                 <span>NEW ARRIVAL</span>
               </div>
+
               <div className="product-info">
                 <small>{item.type}</small>
                 <h3>{item.name}</h3>
@@ -119,10 +129,13 @@ export default function App() {
       </section>
 
       <footer id="about">
-        <a className="logo" href="#">ALA<span>MIN</span><i>.</i></a>
+        <a className="logo" href="#">
+          ALA<span>MIN</span><i>.</i>
+        </a>
         <p>THE FUTURE OF TECHNOLOGY.</p>
         <small>© 2026 ALAMIN. All rights reserved.</small>
       </footer>
+
     </main>
   );
 }
