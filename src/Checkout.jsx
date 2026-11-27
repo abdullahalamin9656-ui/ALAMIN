@@ -1,12 +1,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingBag, MapPin, User, Phone, Truck } from 'lucide-react';
+import {
+  ArrowLeft,
+  ShoppingBag,
+  User,
+  Phone,
+  MapPin,
+  Truck,
+  MessageCircle
+} from 'lucide-react';
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const [cart, setCart] = useState([]);
 
+  const [cart, setCart] = useState([]);
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -16,26 +24,30 @@ export default function Checkout() {
   });
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('alamin-cart') || '[]');
-    setCart(Array.isArray(saved) ? saved : []);
+    const savedCart = JSON.parse(
+      localStorage.getItem('alamin-cart') || '[]'
+    );
+    setCart(savedCart);
   }, []);
 
   const subtotal = cart.reduce(
     (sum, item) =>
-      sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+      sum + Number(item.price || 0) * Number(item.quantity || 1),
     0
   );
 
   const deliveryCharge = 0;
   const total = subtotal + deliveryCharge;
 
-  const money = amount => '৳' + amount.toLocaleString('en-BD');
-
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((previous) => ({
+      ...previous,
+      [name]: value
+    }));
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (cart.length === 0) {
@@ -44,257 +56,394 @@ export default function Checkout() {
       return;
     }
 
-    alert('Checkout information saved. Order submission will be connected in the next step.');
+    const orderItems = cart.map((item, index) => {
+      const name = item.name || item.title || 'Product';
+
+      return (
+        `${index + 1}. ${name}\n` +
+        `Quantity: ${item.quantity || 1}\n` +
+        `Price: ৳${Number(item.price || 0).toLocaleString('en-IN')}\n`
+      );
+    }).join('\n');
+
+    const message = `
+🛒 ALAMIN - NEW ORDER
+
+👤 CUSTOMER INFORMATION
+
+Name: ${form.name}
+Phone: ${form.phone}
+District: ${form.district}
+Area: ${form.area}
+Full Address: ${form.address}
+
+📦 ORDER DETAILS
+
+${orderItems}
+
+💰 Subtotal: ৳${subtotal.toLocaleString('en-IN')}
+🚚 Delivery: To be confirmed
+💵 Total: ৳${total.toLocaleString('en-IN')}
+
+Please confirm my order.
+
+Thank you for shopping with ALAMIN.
+`;
+
+    const whatsappURL =
+      'https://wa.me/8801893241507?text=' +
+      encodeURIComponent(message);
+
+    window.location.href = whatsappURL;
   };
 
-  return (
-    <div style={{
+  const styles = {
+    page: {
       minHeight: '100vh',
       background: '#050816',
       color: '#fff',
-      padding: '25px 5%',
-      fontFamily: 'Inter, sans-serif'
-    }}>
-      <button onClick={() => navigate('/cart')} style={{
-        background: 'transparent',
-        color: '#00c8ff',
-        border: '1px solid #087cff',
-        padding: '10px 16px',
-        borderRadius: '10px',
-        cursor: 'pointer'
-      }}>
-        <ArrowLeft size={16} /> Back to Cart
-      </button>
+      padding: '30px 16px 60px',
+      fontFamily: 'Inter, Arial, sans-serif'
+    },
+    container: {
+      maxWidth: '1100px',
+      margin: '0 auto'
+    },
+    header: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '30px'
+    },
+    back: {
+      background: '#101c32',
+      border: '1px solid #243c5b',
+      color: '#fff',
+      padding: '10px',
+      borderRadius: '12px',
+      cursor: 'pointer'
+    },
+    title: {
+      fontSize: '26px',
+      fontWeight: '800',
+      margin: 0
+    },
+    subtitle: {
+      color: '#8fa6c3',
+      marginTop: '6px',
+      fontSize: '13px'
+    },
+    grid: {
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 1.5fr) minmax(280px, 0.9fr)',
+      gap: '22px',
+      alignItems: 'start'
+    },
+    card: {
+      background: '#0b1426',
+      border: '1px solid #1b3150',
+      borderRadius: '18px',
+      padding: '24px',
+      marginBottom: '20px'
+    },
+    heading: {
+      fontSize: '18px',
+      fontWeight: '750',
+      margin: '0 0 22px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px'
+    },
+    label: {
+      display: 'block',
+      color: '#b8c8dc',
+      fontSize: '13px',
+      marginBottom: '8px'
+    },
+    input: {
+      width: '100%',
+      boxSizing: 'border-box',
+      background: '#060e1c',
+      border: '1px solid #263d5c',
+      borderRadius: '10px',
+      padding: '14px',
+      color: '#fff',
+      outline: 'none',
+      fontSize: '14px',
+      marginBottom: '17px'
+    },
+    textarea: {
+      width: '100%',
+      boxSizing: 'border-box',
+      background: '#060e1c',
+      border: '1px solid #263d5c',
+      borderRadius: '10px',
+      padding: '14px',
+      color: '#fff',
+      outline: 'none',
+      fontSize: '14px',
+      minHeight: '100px',
+      resize: 'vertical'
+    },
+    item: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      gap: '12px',
+      padding: '14px 0',
+      borderBottom: '1px solid #20324b'
+    },
+    itemName: {
+      fontSize: '14px',
+      fontWeight: '650'
+    },
+    muted: {
+      color: '#8fa6c3',
+      fontSize: '12px',
+      marginTop: '6px'
+    },
+    totalRow: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginTop: '16px',
+      color: '#b8c8dc',
+      fontSize: '14px'
+    },
+    grandTotal: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginTop: '20px',
+      paddingTop: '18px',
+      borderTop: '1px solid #29415f',
+      fontSize: '20px',
+      fontWeight: '800',
+      color: '#00d9ff'
+    },
+    submit: {
+      width: '100%',
+      border: 'none',
+      borderRadius: '12px',
+      padding: '17px',
+      marginTop: '24px',
+      background: 'linear-gradient(110deg, #087cff, #00d9ff)',
+      color: '#00101e',
+      fontSize: '14px',
+      fontWeight: '850',
+      cursor: 'pointer',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '10px'
+    },
+    note: {
+      color: '#8298b5',
+      fontSize: '12px',
+      lineHeight: '1.7',
+      marginTop: '15px'
+    },
+    empty: {
+      textAlign: 'center',
+      padding: '60px 20px',
+      color: '#9bb0ca'
+    }
+  };
 
-      <h1 style={{ fontSize: '32px', marginTop: '30px' }}>
-        Secure Checkout
-      </h1>
-      <p style={{ color: '#91a3bd' }}>
-        Complete your information to continue your order.
-      </p>
-
-      {cart.length === 0 ? (
-        <div style={{
-          marginTop: '30px',
-          padding: '35px',
-          background: '#101d36',
-          borderRadius: '15px',
-          textAlign: 'center'
-        }}>
-          <ShoppingBag size={45} color="#00c8ff" />
-          <h2>Your cart is empty</h2>
-          <button onClick={() => navigate('/')} style={buttonStyle}>
-            Shop Now
-          </button>
-        </div>
-      ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-          gap: '25px',
-          marginTop: '30px'
-        }}>
-          <form onSubmit={handleSubmit} style={panelStyle}>
-            <h2>Delivery Information</h2>
-
-            <label style={labelStyle}>Full Name</label>
-            <div style={inputWrap}>
-              <User size={18} />
-              <input
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Enter your full name"
-                required
-                style={inputStyle}
-              />
-            </div>
-
-            <label style={labelStyle}>Mobile Number</label>
-            <div style={inputWrap}>
-              <Phone size={18} />
-              <input
-                name="phone"
-                type="tel"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="01XXXXXXXXX"
-                pattern="01[0-9]{9}"
-                title="Enter a valid 11-digit Bangladesh mobile number"
-                required
-                style={inputStyle}
-              />
-            </div>
-
-            <label style={labelStyle}>District</label>
-            <input
-              name="district"
-              value={form.district}
-              onChange={handleChange}
-              placeholder="Your district"
-              required
-              style={fullInputStyle}
-            />
-
-            <label style={labelStyle}>Area / Thana</label>
-            <input
-              name="area"
-              value={form.area}
-              onChange={handleChange}
-              placeholder="Your area or thana"
-              required
-              style={fullInputStyle}
-            />
-
-            <label style={labelStyle}>Full Delivery Address</label>
-            <textarea
-              name="address"
-              value={form.address}
-              onChange={handleChange}
-              placeholder="House, road, village and other details"
-              required
-              rows="4"
-              style={{ ...fullInputStyle, resize: 'vertical' }}
-            />
-
-            <button type="submit" style={buttonStyle}>
-              CONTINUE TO PLACE ORDER
+  if (cart.length === 0) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.empty}>
+            <ShoppingBag size={48} />
+            <h2>Your Cart Is Empty</h2>
+            <p>Add products before checkout.</p>
+            <button
+              style={styles.submit}
+              onClick={() => navigate('/')}
+            >
+              CONTINUE SHOPPING
             </button>
-          </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-          <div style={panelStyle}>
-            <h2>Order Summary</h2>
+  return (
+    <div style={styles.page}>
+      <div style={styles.container}>
 
-            {cart.map(item => (
-              <div key={item.id} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 0',
-                borderBottom: '1px solid #263954'
-              }}>
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  style={{
-                    width: '65px',
-                    height: '65px',
-                    objectFit: 'contain',
-                    background: '#fff',
-                    borderRadius: '8px'
-                  }}
-                />
-                <div style={{ flex: 1 }}>
-                  <strong>{item.name || item.title}</strong>
-                  <p style={{ color: '#91a3bd', margin: '5px 0' }}>
-                    Quantity: {item.quantity || 1}
-                  </p>
-                </div>
-                <strong>{money((Number(item.price) || 0) * (Number(item.quantity) || 1))}</strong>
-              </div>
-            ))}
+        <div style={styles.header}>
+          <button
+            style={styles.back}
+            onClick={() => navigate('/cart')}
+          >
+            <ArrowLeft size={20} />
+          </button>
 
-            <div style={summaryRow}>
-              <span>Subtotal</span>
-              <strong>{money(subtotal)}</strong>
-            </div>
-
-            <div style={summaryRow}>
-              <span><Truck size={16} /> Delivery Charge</span>
-              <strong>{money(deliveryCharge)}</strong>
-            </div>
-
-            <div style={{
-              ...summaryRow,
-              borderTop: '1px solid #263954',
-              paddingTop: '18px',
-              fontSize: '20px',
-              color: '#00d9ff'
-            }}>
-              <strong>Total</strong>
-              <strong>{money(total)}</strong>
-            </div>
-
-            <p style={{
-              color: '#91a3bd',
-              fontSize: '12px',
-              marginTop: '20px'
-            }}>
-              <MapPin size={14} /> Delivery charge will be confirmed in the next step.
+          <div>
+            <h1 style={styles.title}>CHECKOUT</h1>
+            <p style={styles.subtitle}>
+              Complete your order at ALAMIN
             </p>
           </div>
         </div>
-      )}
+
+        <form onSubmit={handleSubmit}>
+          <div style={styles.grid}>
+
+            <div>
+              <div style={styles.card}>
+                <h2 style={styles.heading}>
+                  <User color="#00d9ff" size={20} />
+                  Delivery Information
+                </h2>
+
+                <label style={styles.label}>
+                  Full Name *
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  name="name"
+                  placeholder="Enter your full name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
+
+                <label style={styles.label}>
+                  Phone Number *
+                </label>
+                <input
+                  style={styles.input}
+                  type="tel"
+                  name="phone"
+                  placeholder="01XXXXXXXXX"
+                  pattern="01[0-9]{9}"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                />
+
+                <label style={styles.label}>
+                  District *
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  name="district"
+                  placeholder="Your district"
+                  value={form.district}
+                  onChange={handleChange}
+                  required
+                />
+
+                <label style={styles.label}>
+                  Area / Upazila *
+                </label>
+                <input
+                  style={styles.input}
+                  type="text"
+                  name="area"
+                  placeholder="Your area or upazila"
+                  value={form.area}
+                  onChange={handleChange}
+                  required
+                />
+
+                <label style={styles.label}>
+                  Full Delivery Address *
+                </label>
+                <textarea
+                  style={styles.textarea}
+                  name="address"
+                  placeholder="House, road, village and other details"
+                  value={form.address}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <div style={styles.card}>
+                <h2 style={styles.heading}>
+                  <ShoppingBag color="#00d9ff" size={20} />
+                  Your Order
+                </h2>
+
+                {cart.map((item, index) => (
+                  <div
+                    key={item.id || index}
+                    style={styles.item}
+                  >
+                    <div>
+                      <div style={styles.itemName}>
+                        {item.name || item.title || 'Product'}
+                      </div>
+                      <div style={styles.muted}>
+                        Quantity: {item.quantity || 1}
+                      </div>
+                    </div>
+
+                    <strong>
+                      ৳{(
+                        Number(item.price || 0) *
+                        Number(item.quantity || 1)
+                      ).toLocaleString('en-IN')}
+                    </strong>
+                  </div>
+                ))}
+
+                <div style={styles.totalRow}>
+                  <span>Subtotal</span>
+                  <strong>
+                    ৳{subtotal.toLocaleString('en-IN')}
+                  </strong>
+                </div>
+
+                <div style={styles.totalRow}>
+                  <span>Delivery Charge</span>
+                  <strong>To be confirmed</strong>
+                </div>
+
+                <div style={styles.grandTotal}>
+                  <span>Total</span>
+                  <span>
+                    ৳{total.toLocaleString('en-IN')}
+                  </span>
+                </div>
+
+                <button
+                  type="submit"
+                  style={styles.submit}
+                >
+                  <MessageCircle size={19} />
+                  ORDER VIA WHATSAPP
+                </button>
+
+                <p style={styles.note}>
+                  By placing your order, WhatsApp will open with
+                  your order details. Review the message and press
+                  Send to submit your order. Delivery charges will
+                  be confirmed separately.
+                </p>
+              </div>
+
+              <div style={styles.card}>
+                <h3 style={styles.heading}>
+                  <Truck color="#00d9ff" size={20} />
+                  Delivery Support
+                </h3>
+                <p style={styles.note}>
+                  Our team will contact you to confirm your order
+                  and delivery details.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
-
-const panelStyle = {
-  background: '#101d36',
-  border: '1px solid #203858',
-  borderRadius: '16px',
-  padding: '22px',
-  minWidth: 0
-};
-
-const labelStyle = {
-  display: 'block',
-  marginTop: '18px',
-  marginBottom: '8px',
-  color: '#c5d5e9',
-  fontSize: '14px'
-};
-
-const inputWrap = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
-  background: '#081329',
-  border: '1px solid #294365',
-  borderRadius: '9px',
-  padding: '0 12px',
-  color: '#00c8ff'
-};
-
-const inputStyle = {
-  width: '100%',
-  minWidth: 0,
-  padding: '13px 0',
-  background: 'transparent',
-  border: 0,
-  outline: 'none',
-  color: '#fff',
-  fontSize: '14px'
-};
-
-const fullInputStyle = {
-  width: '100%',
-  boxSizing: 'border-box',
-  padding: '13px',
-  background: '#081329',
-  border: '1px solid #294365',
-  borderRadius: '9px',
-  color: '#fff',
-  outline: 'none',
-  fontSize: '14px'
-};
-
-const summaryRow = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: '10px',
-  marginTop: '18px'
-};
-
-const buttonStyle = {
-  width: '100%',
-  padding: '15px',
-  marginTop: '25px',
-  background: 'linear-gradient(90deg,#087cff,#00c8ff)',
-  color: '#fff',
-  border: 0,
-  borderRadius: '10px',
-  fontWeight: 'bold',
-  cursor: 'pointer'
-};
